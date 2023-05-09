@@ -4,6 +4,19 @@ from pyspark.sql.functions import *
 
 # COMMAND ----------
 
+import dlt
+import mlflow
+from pyspark.sql.functions import *
+from typing import Iterator, Tuple
+import pandas as pd
+from databricks.feature_store import FeatureStoreClient
+from mlflow.tracking import MlflowClient
+
+client = MlflowClient()
+fs = FeatureStoreClient()
+
+# COMMAND ----------
+
 json_path = "/FileStore/OH/transaction_landing_dir"
 schema_location = "/FileStore/OH/transaction_landing_dir/schema"
 @dlt.table(
@@ -29,7 +42,7 @@ def bronze_transaction_j():
 def card_transaction_features_j():
   return(
     dlt.readStream("bronze_transaction_j")
-     .drop("class", "time")
+     .drop("class")
   )
 
 # COMMAND ----------

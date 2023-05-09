@@ -4,8 +4,12 @@
 
 # COMMAND ----------
 
+checkpoint_location = "FileStore/OH/anomaly_pred/checlpoint"
+dbutils.fs.rm(checkpoint_location, True)
 
-import dlt
+# COMMAND ----------
+
+
 import mlflow
 from pyspark.sql.functions import *
 from typing import Iterator, Tuple
@@ -55,15 +59,19 @@ logged_model = client.get_latest_versions(model_name, stages=["Production"])[0].
 # spark.udf.register("detect_anomaly", udf_predict)
 
 # features = ['transaction_id', 'timestamp']
-def input_df(table):
-  df = spark.readStream.table(f"hive_metastore.oh_anomaly_detection.{table}").drop("fraud")
-  return df
+input_df = spark.readStream.table(f"hive_metastore.oh_anomaly_detection.card_transaction_labels_j").drop("fraud")
 
-@dlt.create_table(
-  comment="anomaly detection model for identifying OOD data",  
-  table_properties={
-    "quality": "gold"
-  }    
-)
-def anomaly_predictions():
-  return fs.score_batch(model_uri, input_df("card_transaction_labels"))
+# @dlt.create_table(
+#   comment="anomaly detection model for identifying OOD data",  
+#   table_properties={
+#     "quality": "gold"
+#   }    
+# )
+# def anomaly_predictions():
+#   return fs.score_batch(model_uri, input_df("card_transaction_labels"))
+pred_df = fs.score_batch(model_uri, input_df)
+
+
+# COMMAND ----------
+
+pred_df.writeStream.option("checkpointLocation", checkpoint_location).table("hive_metastore.oh_anomaly_detection.anomaly_prediction")

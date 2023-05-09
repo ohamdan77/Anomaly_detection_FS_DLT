@@ -34,6 +34,10 @@ fs = FeatureStoreClient()
 
 # COMMAND ----------
 
+# mlflow.delete_experiment('1093408468596087')
+
+# COMMAND ----------
+
 # MAGIC %md Create an MLflow experiment
 
 # COMMAND ----------
@@ -60,11 +64,11 @@ mlflow.set_experiment(experiment_location)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC USE oh_anomaly_detection
+# MAGIC USE hive_metastore.oh_anomaly_detection
 
 # COMMAND ----------
 
-columns = spark.read.table("transaction_features").columns
+columns = spark.read.table("oh_anomaly_feat_db.transaction_features").columns
 remove = [ 'transaction_id']
 names = [item for item in columns if item not in remove]
 
@@ -76,7 +80,7 @@ names
 
 feature_lookups = [
     FeatureLookup(
-      table_name = 'transaction_features',
+      table_name = 'oh_anomaly_feat_db.transaction_features',
       feature_names = names,
       lookup_key = 'transaction_id',
       # timestamp_lookup_key= 'timestamp'
@@ -113,7 +117,7 @@ data = training_df.toPandas()
 
 # Split into training and test datasets
 label = 'fraud'
-features = [col for col in data.columns if col not in [label, 'transaction_id', 'timestamp']]
+features = [col for col in data.columns if col not in [label, 'transaction_id']]
 
 X_train, X_test, y_train, y_test = train_test_split(data[features], data[label], test_size=0.25, random_state=123, shuffle=True)
 
@@ -187,6 +191,12 @@ client = MlflowClient()
 
 # COMMAND ----------
 
+# model_registry_name = 'anomaly_detection_model'
+# client.transition_model_version_stage(model_registry_name, version=1, stage='Archived')
+# client.delete_registered_model(model_registry_name)
+
+# COMMAND ----------
+
 # Create a Model Registry entry for the model if one does not exist
 model_registry_name = 'anomaly_detection_model'
 try:
@@ -242,8 +252,8 @@ promote_to_prod = client.transition_model_version_stage(name=model_registry_name
 
 # COMMAND ----------
 
-model_uri = f'runs:/{run_id}/model'
+# model_uri = f'runs:/{run_id}/model'
 
-with_predictions = fs.score_batch(model_uri, new_tr_df)
+# with_predictions = fs.score_batch(model_uri, new_tr_df)
 
-display(with_predictions)
+# display(with_predictions)

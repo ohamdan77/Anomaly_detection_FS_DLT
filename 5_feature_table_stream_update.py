@@ -30,27 +30,30 @@ fs = FeatureStoreClient()
 
 # MAGIC %sql
 # MAGIC
-# MAGIC USE oh_anomaly_detection
+# MAGIC USE hive_metastore.oh_anomaly_feat_db
 
 # COMMAND ----------
 
-feature_df = spark.read.table("card_transaction_features").drop("time")
+
+json_landing_stream = "/FileStore/OH/transaction_landing_stream_dir"
+schema = spark.read.json(json_landing_stream).schema
+feature_df = spark.readStream.format("json").schema(schema).load(json_landing_stream)
 
 # COMMAND ----------
 
 feature_table_name = "transaction_features"
 
-try:
-  fs.get_table(feature_table_name)
-  print("Feature table entry already exists")
-  pass
+# try:
+#   fs.get_table(feature_table_name)
+#   print("Feature table entry already exists")
+#   pass
   
-except Exception:
-  fs.create_table(name = feature_table_name,
-                          primary_keys = 'transaction_id',
-                          # timestamp_keys= 'timestamp',
-                          schema = feature_df.schema,
-                          description = 'credit card transactions features')
+# except Exception:
+#   fs.create_table(name = feature_table_name,
+#                           primary_keys = 'transaction_id',
+#                           timestamp_keys= 'timestamp',
+#                           schema = feature_df.schema,
+#                           description = 'credit card transactions features')
 
 # COMMAND ----------
 
