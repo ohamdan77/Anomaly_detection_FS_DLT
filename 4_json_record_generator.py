@@ -77,6 +77,7 @@ dbutils.fs.mkdirs(json_landing_stream)
 
 # COMMAND ----------
 
+json_landing = "/FileStore/OH/transaction_landing_dir"
 schema = spark.read.json(json_landing).schema
 
 # COMMAND ----------
@@ -91,5 +92,6 @@ schema = spark.read.json(json_landing).schema
       .writeStream
       .format("json")
       .option("checkpointLocation", "/FileStore/OH/transaction_landing_stream_dir/checkpoint/")
+      .trigger(once=True)
       .start(json_landing_stream)
       )

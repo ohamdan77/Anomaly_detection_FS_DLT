@@ -37,7 +37,7 @@ fs = FeatureStoreClient()
 
 json_landing_stream = "/FileStore/OH/transaction_landing_stream_dir"
 schema = spark.read.json(json_landing_stream).schema
-feature_df = spark.readStream.format("json").schema(schema).load(json_landing_stream)
+feature_df = spark.read.format("json").schema(schema).load(json_landing_stream)
 
 # COMMAND ----------
 

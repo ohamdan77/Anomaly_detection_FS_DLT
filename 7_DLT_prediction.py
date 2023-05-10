@@ -74,4 +74,8 @@ pred_df = fs.score_batch(model_uri, input_df)
 
 # COMMAND ----------
 
-pred_df.writeStream.option("checkpointLocation", checkpoint_location).table("hive_metastore.oh_anomaly_detection.anomaly_prediction")
+(
+  pred_df.writeStream
+         .option("checkpointLocation", checkpoint_location)
+         .trigger(once=True)
+         .table("hive_metastore.oh_anomaly_detection.anomaly_prediction"))
