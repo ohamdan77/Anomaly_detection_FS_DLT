@@ -50,7 +50,3 @@ dbutils.fs.rm(json_landing_stream_fs, True)
 
 checkppoint = "/FileStore/OH/stream/checkpoint/"
 dbutils.fs.rm(checkppoint, True)
-
-# COMMAND ----------
-
-spark.table("anomaly_prediction").count()
