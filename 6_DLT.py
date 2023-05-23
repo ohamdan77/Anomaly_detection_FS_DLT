@@ -4,25 +4,30 @@ from pyspark.sql.functions import *
 
 # COMMAND ----------
 
-import dlt
-import mlflow
-from pyspark.sql.functions import *
-from typing import Iterator, Tuple
-import pandas as pd
-from databricks.feature_store import FeatureStoreClient
-from mlflow.tracking import MlflowClient
+# import dlt
+# # import mlflow
+# from pyspark.sql.functions import *
+# from typing import Iterator, Tuple
+# import pandas as pd
+# from databricks.feature_store import FeatureStoreClient
+# from mlflow.tracking import MlflowClient
 
-client = MlflowClient()
-fs = FeatureStoreClient()
+# client = MlflowClient()
+# fs = FeatureStoreClient()
 
 # COMMAND ----------
 
-json_path = "/FileStore/OH/transaction_landing_dir"
+
+
+# COMMAND ----------
+
+json_path = "/FileStore/OH/transaction_landing_stream_dir"
 schema_location = "/FileStore/OH/transaction_landing_dir/schema"
 @dlt.table(
-  comment = "Bronze table to collect transaction data"
+  comment = "Bronze table to collect transaction data",
+  path = "dbfs:/user/hive/warehouse/oh_anomaly_detection.db/anomaly_bronze"
 )
-def bronze_transaction_j():
+def anomaly_bronze():
   return (
     spark.readStream.format("cloudFiles")
      .option("cloudFiles.format", "json")
@@ -37,22 +42,24 @@ def bronze_transaction_j():
 # COMMAND ----------
 
 @dlt.table(
-  comment = "transaction features silver table"
+  comment = "transaction features silver table",
+  path = "dbfs:/user/hive/warehouse/oh_anomaly_detection.db/card_transaction_features"
 )
-def card_transaction_features_j():
+def card_transaction_features():
   return(
-    dlt.readStream("bronze_transaction_j")
+    dlt.readStream("anomaly_bronze")
      .drop("class")
   )
 
 # COMMAND ----------
 
 @dlt.table(
-  comment = "transaction labels silver table"
+  comment = "transaction labels silver table",
+  path = "dbfs:/user/hive/warehouse/oh_anomaly_detection.db/card_transaction_labels"
 )
 def card_transaction_labels_j():
   return(
-    dlt.readStream("bronze_transaction_j")
+    dlt.readStream("anomaly_bronze")
      .select("transaction_id", col("class").alias("fraud"))
   )
 

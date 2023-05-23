@@ -1,6 +1,6 @@
 # Databricks notebook source
-# MAGIC
-# MAGIC %pip install mlflow cloudpickle==1.6.0 pandas==1.2.4 psutil==5.8.0 scikit-learn==0.24.1 typing-extensions==3.7.4.3 xgboost==1.5.2 databricks-feature-store
+
+# %pip install mlflow cloudpickle==1.6.0 pandas==1.2.4 psutil==5.8.0 scikit-learn==0.24.1 typing-extensions==3.7.4.3 xgboost==1.5.2 databricks-feature-store
 
 # COMMAND ----------
 
@@ -59,7 +59,7 @@ logged_model = client.get_latest_versions(model_name, stages=["Production"])[0].
 # spark.udf.register("detect_anomaly", udf_predict)
 
 # features = ['transaction_id', 'timestamp']
-input_df = spark.readStream.table(f"hive_metastore.oh_anomaly_detection.card_transaction_labels_j").drop("fraud")
+input_df = spark.readStream.table(f"hive_metastore.oh_anomaly_detection.card_transaction_labels").drop("fraud")
 
 # @dlt.create_table(
 #   comment="anomaly detection model for identifying OOD data",  

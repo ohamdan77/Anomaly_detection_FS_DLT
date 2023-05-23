@@ -3,6 +3,7 @@
 
 # COMMAND ----------
 
+# DBTITLE 1,Import the needed Libraries and functions
 from pyspark.sql.functions import col
 import pyspark.sql.functions as func
 from databricks.feature_store import FeatureStoreClient
@@ -18,26 +19,16 @@ fs = FeatureStoreClient()
 
 # COMMAND ----------
 
-fs.drop_table("transaction_features")
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC
-# MAGIC Put all the "V" Features in a feature store table. The column *time* is not needed
-
-# COMMAND ----------
-
 # MAGIC %sql
-# MAGIC -- CREATE DATABASE oh_anomaly_feat_db;
-# MAGIC USE hive_metastore.oh_anomaly_feat_db
+# MAGIC USE hive_metastore.oh_anomaly_detection
 
 # COMMAND ----------
 
-feature_df = spark.read.table("hive_metastore.oh_anomaly_detection.card_transaction_features")
+feature_df = spark.read.table("card_transaction_features")
 
 # COMMAND ----------
 
+# DBTITLE 1,Create the Feature Store table
 feature_table_name = "transaction_features"
 
 try:
@@ -54,6 +45,7 @@ except Exception:
 
 # COMMAND ----------
 
+# DBTITLE 1,Write the Features in the feature store table
 fs.write_table(
   
   name= feature_table_name,

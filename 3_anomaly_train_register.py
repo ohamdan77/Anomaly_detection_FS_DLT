@@ -1,9 +1,10 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC Import the necessary packages
+# MAGIC ## Model Training and regitration
 
 # COMMAND ----------
 
+# DBTITLE 1,Import needed Libraries and functions
 from databricks.feature_store import FeatureLookup
 from databricks.feature_store import FeatureStoreClient
 import mlflow
@@ -34,14 +35,11 @@ fs = FeatureStoreClient()
 
 # COMMAND ----------
 
-# mlflow.delete_experiment('1093408468596087')
-
-# COMMAND ----------
-
 # MAGIC %md Create an MLflow experiment
 
 # COMMAND ----------
 
+# DBTITLE 1,Create an MLFlow experiment to be used for training
 def get_or_create_experiment(experiment_location: str) -> None:
  
   if not mlflow.get_experiment_by_name(experiment_location):
@@ -68,7 +66,7 @@ mlflow.set_experiment(experiment_location)
 
 # COMMAND ----------
 
-columns = spark.read.table("oh_anomaly_feat_db.transaction_features").columns
+columns = spark.read.table("transaction_features").columns
 remove = [ 'transaction_id']
 names = [item for item in columns if item not in remove]
 
@@ -80,7 +78,7 @@ names
 
 feature_lookups = [
     FeatureLookup(
-      table_name = 'oh_anomaly_feat_db.transaction_features',
+      table_name = 'transaction_features',
       feature_names = names,
       lookup_key = 'transaction_id',
       # timestamp_lookup_key= 'timestamp'
@@ -188,12 +186,6 @@ with mlflow.start_run() as run:
 # COMMAND ----------
 
 client = MlflowClient()
-
-# COMMAND ----------
-
-# model_registry_name = 'anomaly_detection_model'
-# client.transition_model_version_stage(model_registry_name, version=1, stage='Archived')
-# client.delete_registered_model(model_registry_name)
 
 # COMMAND ----------
 
