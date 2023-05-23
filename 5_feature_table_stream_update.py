@@ -18,10 +18,6 @@ fs = FeatureStoreClient()
 
 # COMMAND ----------
 
-# fs.drop_table("transaction_features")
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC
 # MAGIC Put all the "V" Features in a feature store table. The column *time* is not needed
@@ -30,14 +26,14 @@ fs = FeatureStoreClient()
 
 # MAGIC %sql
 # MAGIC
-# MAGIC USE hive_metastore.oh_anomaly_feat_db
+# MAGIC USE hive_metastore.oh_anomaly_detection
 
 # COMMAND ----------
 
 
-json_landing_stream = "/FileStore/OH/transaction_landing_stream_dir"
-schema = spark.read.json(json_landing_stream).schema
-feature_df = spark.read.format("json").schema(schema).load(json_landing_stream)
+json_landing_stream_fs = "/FileStore/OH/transaction_landing_stream_dir_fs"
+schema = spark.read.json(json_landing_stream_fs).schema
+feature_df = spark.readStream.format("json").schema(schema).load(json_landing_stream_fs)
 
 # COMMAND ----------
 

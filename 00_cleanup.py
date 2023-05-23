@@ -33,3 +33,24 @@ mlflow.delete_experiment(exp_id)
 model_registry_name = 'anomaly_detection_model'
 client.transition_model_version_stage(model_registry_name, version=1, stage='Archived')
 client.delete_registered_model(model_registry_name)
+
+# COMMAND ----------
+
+json_landing_stream = "/FileStore/OH/transaction_landing_stream_dir"
+dbutils.fs.rm(json_landing_stream, True)
+# dbutils.fs.mkdirs(json_landing_stream)
+
+# COMMAND ----------
+
+json_landing_stream_fs = "/FileStore/OH/transaction_landing_stream_dir_fs"
+dbutils.fs.rm(json_landing_stream_fs, True)
+# dbutils.fs.mkdirs(json_landing_stream_fs)
+
+# COMMAND ----------
+
+checkppoint = "/FileStore/OH/stream/checkpoint/"
+dbutils.fs.rm(checkppoint, True)
+
+# COMMAND ----------
+
+spark.table("anomaly_prediction").count()
