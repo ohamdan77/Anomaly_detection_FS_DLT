@@ -1,7 +1,7 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC
-# MAGIC Read the data in *s3://files.training.databricks.com/ohamdan/creditcard.csv* and create from it twoa Delta table following the below requirements:
+# MAGIC Read the data in *s3://files.training.databricks.com/classes/ohamdan/creditcard.csv* and create from it twoa Delta table following the below requirements:
 # MAGIC * Create a Database to store the Delta tables meta data
 # MAGIC * Add a column to the table calling it *transcation_id* as an increasing index
 # MAGIC * select the *transaction_id* and the *class* columns and put them in a first Delta table *card_transactions_labels*
@@ -25,7 +25,7 @@ raw_df = (spark.read
                .format("csv")
                .option("inferSchema", True)
                .option("header", True)
-               .load("s3://files.training.databricks.com/ohamdan/creditcard.csv")
+               .load("s3://files.training.databricks.com/classes/ohamdan/creditcard.csv")
                .coalesce(1)
                .withColumn("transaction_id", monotonically_increasing_id()))
               #  .withColumn("timestamp", current_timestamp()))
