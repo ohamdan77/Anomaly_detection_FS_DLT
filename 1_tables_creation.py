@@ -14,6 +14,15 @@ from pyspark.sql.functions import *
 
 # COMMAND ----------
 
+# MAGIC %sh 
+# MAGIC pip install kaggle
+# MAGIC export KAGGLE_USERNAME=omarhamdandata
+# MAGIC export KAGGLE_KEY=6fa85eea9baf2ea4c1682d7701910799
+# MAGIC kaggle datasets download -d mlg-ulb/creditcardfraud -p /dbfs/creditcard/data/
+# MAGIC cd /dbfs/creditcard/data/ &&  unzip /dbfs/creditcard/data/creditcardfraud.zip
+
+# COMMAND ----------
+
 # MAGIC %sql
 # MAGIC
 # MAGIC CREATE DATABASE IF NOT EXISTS oh_anomaly_detection;
@@ -25,7 +34,8 @@ raw_df = (spark.read
                .format("csv")
                .option("inferSchema", True)
                .option("header", True)
-               .load("s3://files.training.databricks.com/classes/ohamdan/creditcard.csv")
+               .load("dbfs:/creditcard/data/creditcard.csv")
+              #  .load("s3://files.training.databricks.com/classes/ohamdan/creditcard.csv")
                .coalesce(1)
                .withColumn("transaction_id", monotonically_increasing_id()))
               #  .withColumn("timestamp", current_timestamp()))
